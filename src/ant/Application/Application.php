@@ -8,18 +8,41 @@
 
 namespace Ant\Application;
 
+use ReflectionClass;
+
 class Application
 {
-
     protected $singleton = [];
 
     protected $typeContainer = [];
 
     protected $instances = [];
 
+    protected static $instance;
+
+    const TYPE_SINGLETON = 'singleton';
+
+    public function __construct()
+    {
+        static::setInstance($this);
+    }
+
+    public static function setInstance(Application $app)
+    {
+        self::$instance = $app;
+    }
+
+    /**
+     * @return Application
+     */
+    public static function getInstance()
+    {
+        return self::$instance;
+    }
+
     public function singleton($abstract, $implementation)
     {
-        $this->bind('singleton', $abstract, $implementation);
+        $this->bind(self::TYPE_SINGLETON, $abstract, $implementation);
     }
 
     protected function bind($type, $abstract, $implementation)
@@ -32,17 +55,15 @@ class Application
     public function get($abstract, $params = null)
     {
         $type = $this->typeContainer[$abstract];
+        $instance = null;
 
-        return $this->{'generate' . $type}($type, $abstract, $params);
-    }
-
-    protected function generateSingleton($type, $abstract, $params)
-    {
-        $implementation = $this->{$type}[$abstract];
-        if (empty($this->instances[$abstract])) {
-            $this->instances[$abstract] = new $implementation;
+        switch ($type) {
+            case self::TYPE_SINGLETON:
+                $instance = SingletonFactory::get($abstract, $this->{$type}[$abstract], $params);
+                break;
         }
 
-        return $this->instances[$abstract];
+        return $instance;
     }
+
 }

@@ -19,6 +19,8 @@ $app = new \Ant\Application\Application();
 
 $app->singleton(\Ant\Controller\IFrontController::class, \Ant\Controller\FrontController::class);
 
+$app->singleton(\Ant\Http\IRequest::class, \Ant\Http\Request::class);
+
 $front = $app->get(\Ant\Controller\IFrontController::class);
 
 $front->run();

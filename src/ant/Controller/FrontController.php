@@ -8,11 +8,13 @@
 
 namespace Ant\Controller;
 
+use Ant\Http\IRequest;
+
 class FrontController implements IFrontController
 {
-    public function __construct()
+    public function __construct(IRequest $request)
     {
-
+        
     }
 
     public function run()
