@@ -26,5 +26,13 @@ class Request implements IRequest
         $this->server = $_SERVER;
     }
 
+    public function getCurrentURI()
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
 
+    public function getRequestMethod()
+    {
+        return $_SERVER['REQUEST_METHOD'];
+    }
 }

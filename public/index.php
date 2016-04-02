@@ -15,7 +15,11 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$app = new \Ant\Application\Application();
+require_once __DIR__ . '/../app/Http/Routes.php';
+
+$config['DB'] = require_once __DIR__ . '/../config/database.php';
+
+$app = new \Ant\Application\Application($config);
 
 $app->singleton(\Ant\Controller\IFrontController::class, \Ant\Controller\FrontController::class);
 

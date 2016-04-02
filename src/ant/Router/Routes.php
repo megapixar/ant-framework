@@ -24,4 +24,23 @@ class Routes
         self::$gets[$url] = $function;
     }
 
+    public static function getCallbackByURI($uri, $type = null)
+    {
+        $routes = null;
+        switch ($type) {
+            case 'POST':
+                $routes = self::$posts;
+                break;
+            case 'GET':
+                $routes = self::$gets;
+                break;
+            default:
+//                $routes = self::$posts;
+        }
+
+        if (!empty($routes[$uri])) {
+            return $routes[$uri];
+        }
+    }
+
 }

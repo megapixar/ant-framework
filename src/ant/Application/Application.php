@@ -8,28 +8,19 @@
 
 namespace Ant\Application;
 
-use ReflectionClass;
-
 class Application
 {
-    protected $singleton = [];
-
-    protected $typeContainer = [];
-
-    protected $instances = [];
-
-    protected static $instance;
-
     const TYPE_SINGLETON = 'singleton';
+    protected static $instance;
+    protected $singleton = [];
+    protected $typeContainer = [];
+    protected $instances = [];
+    protected $config = [];
 
-    public function __construct()
+    public function __construct(array $config)
     {
+        $this->config = $config;
         static::setInstance($this);
-    }
-
-    public static function setInstance(Application $app)
-    {
-        self::$instance = $app;
     }
 
     /**
@@ -38,6 +29,11 @@ class Application
     public static function getInstance()
     {
         return self::$instance;
+    }
+
+    public static function setInstance(Application $app)
+    {
+        self::$instance = $app;
     }
 
     public function singleton($abstract, $implementation)
@@ -54,16 +50,28 @@ class Application
 
     public function get($abstract, $params = null)
     {
-        $type = $this->typeContainer[$abstract];
+        $type     = isset($this->typeContainer[$abstract]) ? $this->typeContainer[$abstract] : false;
         $instance = null;
 
         switch ($type) {
             case self::TYPE_SINGLETON:
                 $instance = SingletonFactory::get($abstract, $this->{$type}[$abstract], $params);
                 break;
+            default:
+                $instance = InvokableFactory::get($abstract, $abstract, $params);
         }
 
         return $instance;
+    }
+
+    public function isInstantiable($abstract)
+    {
+        return $abstract && (!empty($this->typeContainer[$abstract]) || class_exists($abstract));
+    }
+
+    protected function getConfig()
+    {
+        return $this->config;
     }
 
 }
