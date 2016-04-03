@@ -25,6 +25,8 @@ $app->singleton(\Ant\Controller\IFrontController::class, \Ant\Controller\FrontCo
 
 $app->singleton(\Ant\Http\IRequest::class, \Ant\Http\Request::class);
 
+$app->get(\Ant\Http\IRequest::class)->capture();
+
 $front = $app->get(\Ant\Controller\IFrontController::class);
 
 $front->run();

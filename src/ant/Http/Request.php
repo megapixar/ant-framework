@@ -26,13 +26,43 @@ class Request implements IRequest
         $this->server = $_SERVER;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCurrentURI()
     {
-        return $_SERVER['REQUEST_URI'];
+        return $this->server['REQUEST_URI'];
     }
 
-    public function getRequestMethod()
+    /**
+     * @param $property
+     *
+     * @return mixed
+     */
+    public function __get($property)
     {
-        return $_SERVER['REQUEST_METHOD'];
+        return $this->getInput()[$property];
+    }
+
+    /**
+     * @param $property
+     * @param $value
+     */
+    public function __set($property, $value)
+    {
+        $this->getInput()[$property] = $value;
+    }
+
+    protected function getInput()
+    {
+        return $this->getMethod() == 'POST' ? $this->post : $this->get;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMethod()
+    {
+        return $this->server['REQUEST_METHOD'];
     }
 }

@@ -34,13 +34,35 @@ class Routes
             case 'GET':
                 $routes = self::$gets;
                 break;
-            default:
-//                $routes = self::$posts;
         }
 
+        $matchedRoute = [];
         if (!empty($routes[$uri])) {
-            return $routes[$uri];
+            $matchedRoute['variables'] = null;
+            $matchedRoute['callback']  = $routes[$uri];
+
+            return $matchedRoute;
         }
+
+        foreach ($routes as $route => $callback) {
+            if (strpos($route, '/:') !== false) {
+                $matchedRoute = [];
+                $routeArr     = explode('/', $route);
+                $uriArr       = explode('/', $uri);
+
+                $dif = array_diff_assoc($routeArr, $uriArr);
+                foreach ($dif as $index => $key) {
+                    if ($key[0] !== ':' || empty($uriArr[$index])) {
+                        continue 2;
+                    }
+                    $matchedRoute['variables'][substr($key, 1)] = $uriArr[$index];
+                }
+                $matchedRoute['callback'] = $routes[$route];
+                break;
+            }
+        }
+
+        return $matchedRoute;
     }
 
 }

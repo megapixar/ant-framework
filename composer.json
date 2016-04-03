@@ -17,8 +17,13 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
-            "Ant\\": "src/ant/"
+            "Ant\\": "src/ant/",
+            "Migration\\": "migrations/"
         }
-
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Migration\\Migrations::up"
+        ]
     }
 }

@@ -13,9 +13,12 @@ use Ant\Http\IRequest;
 use Ant\Http\Request;
 use Ant\Router\Routes;
 use Closure;
+use ReflectionMethod;
 
 class FrontController implements IFrontController
 {
+    const LAYOUT = 'layout';
+
     /**
      * @var Request
      */
@@ -28,19 +31,50 @@ class FrontController implements IFrontController
 
     public function run()
     {
-        $callBack = Routes::getCallbackByURI($this->request->getCurrentURI(), $this->request->getRequestMethod());
+        $route = Routes::getCallbackByURI($this->request->getCurrentURI(), $this->request->getMethod());
 
-        if ($callBack instanceof Closure) {
+        if (empty($route['callback'])) {
+            header("HTTP/1.0 404 Not Found");
+            die('Page Not found');
+        }
+
+        if (($callBack = $route['callback']) instanceof Closure) {
             echo $callBack();
             return;
         }
 
+        list($params, $layout) = $this->getRenderParams($route['callback'], $route['variables']);
+
+        $this->render($params, $layout);
+    }
+
+    protected function getRenderParams($callBack, $variables)
+    {
         list($className, $method) = explode('::', $callBack);
         $class = Application::getInstance()->get('App\\Http\\Controller\\' . $className);
-        ob_start();
-        $res = call_user_func(array($class, $method));
-        if (is_array($res)) {
-            $template = function ($res) use ($class) {
+
+        $refMethod = new ReflectionMethod($class, $method);
+        $params    = [];
+
+        foreach ($refMethod->getParameters() as $i => $parameter) {
+
+            if ($parameter->getClass()) {
+                $params[$i] = Application::getInstance()->get($parameter->getClass()->getName());
+            } else {
+                $params[$i] = $variables[$parameter->getName()];
+            }
+        }
+
+        $layout = property_exists($class, self::LAYOUT) ? $class->{self::LAYOUT} : null;
+        $params = $refMethod->invokeArgs($class, $params);
+
+        return [$params, $layout];
+    }
+
+    protected function render($params, $layout)
+    {
+        if (is_array($params)) {
+            $template = function ($res) use ($layout) {
                 $content = '';
                 if (isset($res['view'])) {
 
@@ -50,18 +84,16 @@ class FrontController implements IFrontController
                     $content = ob_get_clean();
                 }
 
-                if (property_exists($class, 'layout')) {
+                if ($layout) {
                     ob_start("ob_gzhandler");
-                    require_once __DIR__ . "/../../../resources/view/layouts/{$class->layout}.html.php";
+                    require_once __DIR__ . "/../../../resources/view/layouts/{$layout}.html.php";
                 }
 
             };
-            $template($res);
+            $template($params);
         } else {
-            echo $res;
+            echo $params;
         }
-
-
     }
 
 }

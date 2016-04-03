@@ -69,7 +69,7 @@ class Application
         return $abstract && (!empty($this->typeContainer[$abstract]) || class_exists($abstract));
     }
 
-    protected function getConfig()
+    public function getConfig()
     {
         return $this->config;
     }

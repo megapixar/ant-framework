@@ -9,6 +9,9 @@
 namespace App\Http\Controller;
 
 
+use Ant\Http\IRequest;
+use App\Model\Post;
+
 class Blog
 {
     public $layout = 'layout';
@@ -18,8 +21,30 @@ class Blog
         return [
             'view' => 'index',
             'data' => [
-                'text' => 'Hello World'
+                'posts' => Post::findAll(),
+                'text'  => 'Hello World'
             ]
         ];
+    }
+
+    public function store(IRequest $request)
+    {
+
+        $todo = new Post;
+
+        $todo->name        = $request->name;
+        $todo->description = $request->description;
+        $todo->save();
+
+        return header('Location: /blog');
+    }
+
+    public function delete($id)
+    {
+
+        $todo = Post::findByID($id);
+        $todo->delete();
+
+        return header('Location: /blog');
     }
 }
