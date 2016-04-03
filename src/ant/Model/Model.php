@@ -144,6 +144,24 @@ class Model
 
     private function update()
     {
+        $table = static::$table;
+
+        $set    = '';
+        $values = [];
+
+        foreach ($this->attributes as $field => $value) {
+            if ($field === 'id') {
+                continue;
+            }
+
+            $set .= "`$field` = ?,";
+            $values[] = $value;
+        }
+
+        $set      = rtrim($set, ',');
+        $values[] = $this->id;
+
+        return self::runStatement("UPDATE {$table} SET $set WHERE `id` = ?", $values);
     }
 
     public function delete()

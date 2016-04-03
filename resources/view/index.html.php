@@ -37,7 +37,7 @@
                         <form id="delete_<?= $post->id ?>" class="form-inline" action="/post/<?= $post->id ?>/delete"
                               method="POST">
                             <div class="form-group">
-                                <p><a href="/todo/<?= $post->id ?>"><?= $post->name ?></a></p>
+                                <p><a href="/post/<?= $post->id ?>/edit"><?= htmlspecialchars($post->name) ?></a></p>
                             </div>
                             <button form="delete_<?= $post->id ?>" type="submit" value="Submit"
                                     class="btn btn-sm btn-danger pull-right">Delete

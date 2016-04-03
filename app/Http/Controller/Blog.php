@@ -21,8 +21,7 @@ class Blog
         return [
             'view' => 'index',
             'data' => [
-                'posts' => Post::findAll(),
-                'text'  => 'Hello World'
+                'posts' => Post::findAll()
             ]
         ];
     }
@@ -30,11 +29,11 @@ class Blog
     public function store(IRequest $request)
     {
 
-        $todo = new Post;
+        $post = new Post;
 
-        $todo->name        = $request->name;
-        $todo->description = $request->description;
-        $todo->save();
+        $post->name        = $request->name;
+        $post->description = $request->description;
+        $post->save();
 
         return header('Location: /blog');
     }
@@ -46,5 +45,24 @@ class Blog
         $todo->delete();
 
         return header('Location: /blog');
+    }
+
+    public function edit($id, IRequest $request)
+    {
+        $post = Post::findByID($id);
+        if ($request->getMethod() === 'POST') {
+            $post->name        = $request->name;
+            $post->description = $request->description;
+
+            $post->save();
+            return header('Location: /blog');
+        } else {
+            return [
+                'view' => 'edit',
+                'data' => [
+                    'post' => $post
+                ]
+            ];
+        }
     }
 }
