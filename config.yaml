@@ -39,8 +39,8 @@ vagrantfile:
                     - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
         synced_folder:
             vflsf_uuuz4w8cnvcb:
-                source: ./ant-fraemwork
-                target: /var/www/ant-fraemwork
+                source: ./ant-framework
+                target: /var/www/ant-framework
                 sync_type: default
                 smb:
                     smb_host: ''
@@ -120,7 +120,7 @@ nginx:
             server_name: ant
             server_aliases:
                 - ant
-            www_root: /var/www/ant-fraemwork/public/
+            www_root: /var/www/ant-framework/public/
             listen_port: '80'
             index_files:
                 - index.html
